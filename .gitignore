@@ -1,2 +1,8 @@
 # Ignore env folder
 env/
+
+# Ignore testing file
+test.py
+
+# Ignore cache files
+lang_learner/__pycache__/

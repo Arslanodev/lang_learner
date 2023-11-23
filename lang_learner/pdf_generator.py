@@ -1,6 +1,13 @@
 import requests
 
-from markdowngenerator import MarkdownGenerator
+from markdownmaker.document import Document
+from markdownmaker.markdownmaker import (
+    Header,
+    Bold,
+    Paragraph,
+    UnorderedList,
+    OrderedList
+)
 from mdpdf.converter import Converter
 
 
@@ -21,39 +28,42 @@ class MD_Generator:
     - API object
     """
 
-    def __init__(self, api, filename, words):
+    def __init__(self, api, words):
         self.API = api
-        self.filename = filename
         self.words = words
         self.session = requests.Session()
 
     def generate(self):
-        with MarkdownGenerator(filename=self.filename, enable_write=True) as doc:
-            doc.addHeader(level=1, text="Translations")
-            for word in self.words:
-                # Get Data
-                api = self.API(
-                    source_text=word,
-                    source_lang="de",
-                    target_lang="en",
-                    req_session=self.session
-                )
+        doc = Document()
+        doc.add(Header(Bold("Translations")))
+        for word in self.words:
+            # Get Data
+            api = self.API(
+                source_text=word,
+                source_lang="de",
+                target_lang="en",
+                req_session=self.session
+            )
 
-                # Translations
-                translations = []
-                for i, data in enumerate(api.get_translations()):
-                    if i == 3:
-                        break
-                    translations.append(data[1])
+            # Translations
+            translations = []
+            for i, data in enumerate(api.get_translations()):
+                if i == 3:
+                    break
+                translations.append(data[1])
 
-                # Examples
-                examples = []
-                for i, (source, target) in enumerate(api.get_examples()):
-                    if i == 3:
-                        break
-                    examples.append(f"{source.text} - {target.text}")
+            # Examples
+            for source, target in api.get_examples():
+                pass
 
-                # wait
-                doc.writeTextLine(
-                    f'{doc.addBoldedText(api.source_text)} - {", ".join(translations)}')
-                doc.addUnorderedList(examples)
+            # wait
+            doc.add(
+                Paragraph(f'{Bold(api.source_text)} - {", ".join(translations)}'))
+
+            doc.add(OrderedList((
+                Paragraph(next(examples)),
+                Paragraph(next(examples)),
+                Paragraph(next(examples))
+            )))
+
+            md = doc.write()
