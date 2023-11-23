@@ -6,6 +6,7 @@ from markdownmaker.markdownmaker import (
     Bold,
     Paragraph,
     UnorderedList,
+    Italic,
     OrderedList
 )
 from mdpdf.converter import Converter
@@ -28,10 +29,11 @@ class MD_Generator:
     - API object
     """
 
-    def __init__(self, api, words):
+    def __init__(self, api, filename, words):
         self.API = api
         self.words = words
         self.session = requests.Session()
+        self.filename = filename
 
     def generate(self):
         doc = Document()
@@ -53,17 +55,23 @@ class MD_Generator:
                 translations.append(data[1])
 
             # Examples
-            for source, target in api.get_examples():
-                pass
+            examples = []
+            for i, (source, target) in enumerate(api.get_examples()):
+                if i == 3:
+                    break
+                examples.append(f"{source.text} - {target.text}")
 
+            print(examples)
             # wait
             doc.add(
                 Paragraph(f'{Bold(api.source_text)} - {", ".join(translations)}'))
 
             doc.add(OrderedList((
-                Paragraph(next(examples)),
-                Paragraph(next(examples)),
-                Paragraph(next(examples))
+                Italic(examples[0]),
+                Italic(examples[1])
             )))
 
-            md = doc.write()
+            md_text = doc.write()
+
+            with open(f"{self.filename}.md", "w") as fl:
+                fl.write(md_text)

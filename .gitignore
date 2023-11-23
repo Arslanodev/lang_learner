@@ -6,3 +6,6 @@ test.py
 
 # Ignore cache files
 lang_learner/__pycache__/
+
+# Ignore generated file
+translations.md
