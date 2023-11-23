@@ -1,0 +1,6 @@
+requests==2.31.0
+beautifulsoup4==4.12.2
+mdpdf==0.0.18
+gTTS==2.4.0
+click==8.1.7
+markdownmaker==0.4.0
