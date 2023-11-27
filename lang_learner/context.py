@@ -39,8 +39,17 @@ class ReversoContextAPI(object):
 
     """
 
-    def __init__(self, source_text="пример", target_text="", source_lang="ru", target_lang="en", req_session=requests.Session()):
+    def __init__(self,
+                 source_text="пример",
+                 target_text="",
+                 source_lang="ru",
+                 target_lang="en",
+                 req_session=requests.Session(),
+                 examples_count=3,
+                 trans_count=3):
         self.__source_text, self.__target_text, self.__source_lang, self.__target_lang, self.__page_count = None, None, None, None, None
+        self.examples_count = examples_count
+        self.trans_count = trans_count
         self.source_text, self.target_text, self.source_lang, self.target_lang = source_text, target_text, source_lang, target_lang
         self.session = req_session
         self.__update_data()
@@ -126,11 +135,16 @@ class ReversoContextAPI(object):
 
         translations_json = self.session.post("https://context.reverso.net/bst-query-service", headers=HEADERS,
                                               data=json.dumps(self.__data)).json()["dictionary_entry_list"]
-        for translation in translations_json:
-            yield Translation(self.__data["source_text"], translation["term"], translation["alignFreq"],
-                              translation["pos"],
-                              [InflectedForm(form["term"], form["alignFreq"]) for form in
-                               translation["inflectedForms"]])
+        translations = []
+        for index, translation in enumerate(translations_json):
+            translations.append(Translation(self.__data["source_text"], translation["term"], translation["alignFreq"],
+                                            translation["pos"],
+                                            [InflectedForm(form["term"], form["alignFreq"]) for form in
+                                             translation["inflectedForms"]]))
+            if index == self.trans_count - 1:
+                break
+
+        return translations
 
     def get_examples(self):
         """A generator that gets words' usage examples pairs from server pair by pair.
@@ -170,13 +184,21 @@ class ReversoContextAPI(object):
                     idxs.append((cur, cur + len(t)))
                 cur += len(t)
             return idxs
-
+        done = False
+        examples = []
         for npage in range(1, self.page_count + 1):
+            if done:
+                break
             self.__data["npage"] = npage
             examples_json = self.session.post("https://context.reverso.net/bst-query-service", headers=HEADERS,
                                               data=json.dumps(self.__data)).json()["list"]
-            for word in examples_json:
+            for index, word in enumerate(examples_json):
                 source = BeautifulSoup(word["s_text"], features="lxml")
                 target = BeautifulSoup(word["t_text"], features="lxml")
-                yield (WordUsageExample(source.text, find_highlighted_idxs(source)),
-                       WordUsageExample(target.text, find_highlighted_idxs(target)))
+                examples.append((WordUsageExample(source.text, find_highlighted_idxs(source)),
+                                 WordUsageExample(target.text, find_highlighted_idxs(target))))
+                if index == self.examples_count - 1:
+                    done = True
+                    break
+
+        return examples
