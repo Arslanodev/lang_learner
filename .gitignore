@@ -1,6 +1,10 @@
 # Ignore env folder
 env/
 
+# Ignore pdf and md files
+*.md
+*.pdf
+
 # Ignore testing file
 test.py
 

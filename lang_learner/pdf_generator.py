@@ -48,27 +48,23 @@ class MD_Generator:
             )
 
             # Translations
-            translations = []
-            for i, data in enumerate(api.get_translations()):
-                if i == 3:
-                    break
-                translations.append(data[1])
+            translations = [
+                word.translation for word in api.get_translations()]
 
             # Examples
             examples = []
-            for i, (source, target) in enumerate(api.get_examples()):
-                if i == 3:
-                    break
-                examples.append(f"{source.text} - {target.text}")
+            for source_ex, target_ex in api.get_examples():
+                examples.append(
+                    f"{source_ex.text} - {target_ex.text}")
 
-            print(examples)
             # wait
             doc.add(
                 Paragraph(f'{Bold(api.source_text)} - {", ".join(translations)}'))
 
             doc.add(OrderedList((
                 Italic(examples[0]),
-                Italic(examples[1])
+                Italic(examples[1]),
+                Italic(examples[2])
             )))
 
             md_text = doc.write()
