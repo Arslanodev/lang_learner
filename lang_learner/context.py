@@ -2,7 +2,7 @@
 import json
 import asyncio
 
-from typing import List
+from typing import List, Tuple, Iterator
 from collections import namedtuple
 
 import aiohttp
@@ -53,7 +53,7 @@ class ReversoContextAPI(object):
         self.source_lang = source_lang
         self.target_lang = target_lang
 
-    def get_translations(self, response, word) -> Translation:
+    def get_translations(self, response: dict, word: str) -> Translation:
         "Returns Translation namedTuple"
         trans_ls = []
         for index, item in enumerate(response["dictionary_entry_list"]):
@@ -64,11 +64,10 @@ class ReversoContextAPI(object):
 
         return Translation(source_word=word, translation=trans_ls)
 
-    def get_examples(self, response) -> List[WordUsageExample]:
+    def get_examples(self, response: dict) -> List[WordUsageExample]:
         """Returns list of WordUsageExample"""
         examples = []
         for index, ex in enumerate(response['list']):
-
             source = BeautifulSoup(ex["s_text"], features="lxml")
             target = BeautifulSoup(ex["t_text"], features="lxml")
             example = WordUsageExample(
@@ -81,14 +80,19 @@ class ReversoContextAPI(object):
 
         return examples
 
-    async def do_post(self, session, url, word):
+    async def do_post(self,
+                      session: aiohttp.ClientSession,
+                      url: str,
+                      word: List[str]
+                      ) -> Tuple[Translation, List[WordUsageExample]]:
+
         post_data = json.dumps({
             "source_text": word,
             "target_text": "",
             "source_lang": self.source_lang,
             "target_lang": self.target_lang,
         })
-        async with session.post(url, data=post_data) as response:
+        async with session.post(url=url, data=post_data) as response:
             response = await response.json()
 
             translations = self.get_translations(response, word)
@@ -96,13 +100,17 @@ class ReversoContextAPI(object):
 
             return translations, examples
 
-    async def make_words(self):
+    async def make_words(self) -> Iterator[str]:
         for word in self.source_texts:
             yield word
 
-    async def async_post_request(self):
+    async def async_post_request(self) -> List[tuple]:
+        """Performing asynchronous post request to given url"""
+
         url = "https://context.reverso.net/bst-query-service"
-        async with aiohttp.ClientSession(headers=HEADERS, connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+        async with aiohttp.ClientSession(
+                headers=HEADERS,
+                connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
             post_tasks = []
             async for w in self.make_words():
                 post_tasks.append(self.do_post(session, url, w))
@@ -111,7 +119,8 @@ class ReversoContextAPI(object):
 
             return res
 
-    def get_data(self):
+    def get_data(self) -> List[tuple]:
+        """Runs async post request and return response"""
         response = asyncio.run(self.async_post_request())
 
         return response
