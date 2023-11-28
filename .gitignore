@@ -4,6 +4,7 @@ env/
 # Ignore pdf and md files
 *.md
 *.pdf
+*.prof
 
 # Ignore testing file
 test.py

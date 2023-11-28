@@ -1,26 +1,24 @@
 """Reverso Context (context.reverso.net) API for Python"""
-
-from collections import namedtuple
 import json
+import asyncio
+
+from typing import List
+from collections import namedtuple
+
+import aiohttp
 
 from bs4 import BeautifulSoup
-import requests
 
-__all__ = ["ReversoContextAPI", "WordUsageExample",
-           "Translation", "InflectedForm"]
+__all__ = ["ReversoContextAPI"]
 
 HEADERS = {"User-Agent": "Mozilla/5.0",
            "Content-Type": "application/json; charset=UTF-8"
            }
 
-WordUsageExample = namedtuple("WordUsageExample",
-                              ("text", "highlighted"))
+WordUsageExample = namedtuple(
+    "WordUsageExample", ("source_text", "target_text"))
 
-Translation = namedtuple("Translation",
-                         ("source_word", "translation", "frequency", "part_of_speech", "inflected_forms"))
-
-InflectedForm = namedtuple("InflectedForm",
-                           ("translation", "frequency"))
+Translation = namedtuple("Translation", ("source_word", "translation"))
 
 
 class ReversoContextAPI(object):
@@ -40,165 +38,80 @@ class ReversoContextAPI(object):
     """
 
     def __init__(self,
-                 source_text="пример",
-                 target_text="",
-                 source_lang="ru",
-                 target_lang="en",
-                 req_session=requests.Session(),
-                 examples_count=3,
-                 trans_count=3):
-        self.__source_text, self.__target_text, self.__source_lang, self.__target_lang, self.__page_count = None, None, None, None, None
+                 source_texts: list = ["пример"],
+                 target_text: str = "",
+                 source_lang: str = "de",
+                 target_lang: str = "en",
+                 examples_count: int = 3,
+                 trans_count: int = 3):
+
         self.examples_count = examples_count
         self.trans_count = trans_count
-        self.source_text, self.target_text, self.source_lang, self.target_lang = source_text, target_text, source_lang, target_lang
-        self.session = req_session
-        self.__update_data()
 
-    def __update_data(self):
-        self.__data = {
-            "source_text": self.source_text,
-            "target_text": self.target_text,
-            "source_lang": self.source_lang,
-            "target_lang": self.target_lang,
-        }
-        self.__info_modified = True
+        self.source_texts = source_texts
+        self.target_text = target_text
+        self.source_lang = source_lang
+        self.target_lang = target_lang
 
-    @property
-    def page_count(self):
-        if self.__info_modified:
-            self.__page_count = self.session.post("https://context.reverso.net/bst-query-service", headers=HEADERS,
-                                                  data=json.dumps(self.__data)).json()["npages"]
-            self.__info_modified = False
-        return self.__page_count
+    def get_translations(self, response, word) -> Translation:
+        "Returns Translation namedTuple"
+        trans_ls = []
+        for index, item in enumerate(response["dictionary_entry_list"]):
+            trans_ls.append(item['term'])
 
-    @property
-    def source_text(self):
-        return self.__source_text
-
-    @property
-    def target_text(self):
-        return self.__target_text
-
-    @property
-    def source_lang(self):
-        return self.__source_lang
-
-    @property
-    def target_lang(self):
-        return self.__target_lang
-
-    @source_text.setter
-    def source_text(self, value):
-        assert isinstance(value, str), "source text must be a string"
-        self.__source_text = value
-        self.__update_data()
-
-    @target_text.setter
-    def target_text(self, value):
-        assert isinstance(value, str), "target text must be a string"
-        self.__target_text = value
-        self.__update_data()
-
-    # TODO: add deeper check (is specified language really available) instead of just checking is a string given.
-
-    @source_lang.setter
-    def source_lang(self, value):
-        assert isinstance(value, str), "language code must be a string"
-        self.__source_lang = value
-        self.__update_data()
-
-    @target_lang.setter
-    def target_lang(self, value):
-        assert isinstance(value, str), "language code must be a string"
-        self.__target_lang = value
-        self.__update_data()
-
-    def __repr__(self):
-        return "ReversoContextAPI({source_text!r}, {target_text!r}, {source_lang!r}, {target_lang!r})" \
-            .format(**self.__data)
-
-    def __eq__(self, other):
-        if isinstance(other, ReversoContextAPI):
-            return self.source_text == other.source_text \
-                and self.target_text == other.target_text \
-                and self.source_lang == other.source_lang \
-                and self.target_lang == other.target_lang
-        return False
-
-    def get_translations(self):
-        """Yields all available translations for the word (on the website you can find it just before the examples).
-
-        Yields:
-             Translation namedtuples.
-
-        """
-
-        translations_json = self.session.post("https://context.reverso.net/bst-query-service", headers=HEADERS,
-                                              data=json.dumps(self.__data)).json()["dictionary_entry_list"]
-        translations = []
-        for index, translation in enumerate(translations_json):
-            translations.append(Translation(self.__data["source_text"], translation["term"], translation["alignFreq"],
-                                            translation["pos"],
-                                            [InflectedForm(form["term"], form["alignFreq"]) for form in
-                                             translation["inflectedForms"]]))
             if index == self.trans_count - 1:
                 break
 
-        return translations
+        return Translation(source_word=word, translation=trans_ls)
 
-    def get_examples(self):
-        """A generator that gets words' usage examples pairs from server pair by pair.
-
-        Note:
-            Don't try to get all usage examples at one time if there are more than 5 pages (see the page_count attribute). It
-            may take a long time to complete because it will be necessary to connect to the server as many times as there are pages exist.
-            Just get the usage examples one by one as they are being fetched.
-
-        Yields:
-            Tuples with two WordUsageExample namedtuples (for source and target text and highlighted indexes)
-
-        """
-
-        def find_highlighted_idxs(soup, tag="em"):
-            """Finds indexes of the parts of the soup surrounded by a particular HTML tag
-            relatively to the soup without the tag.
-
-            Example:
-                soup = BeautifulSoup("<em>This</em> is <em>a sample</em> string")
-                tag = "em"
-                Returns: [(0, 4), (8, 16)]
-
-            Args:
-                soup: The BeautifulSoup's soup.
-                tag: The HTML tag, which surrounds the parts of the soup.
-
-            Returns:
-                  A list of the tuples, which contain start and end indexes of the soup parts,
-                  surrounded by tags.
-
-            """
-
-            cur, idxs = 0, []
-            for t in soup.find_all(text=True):
-                if t.parent.name == tag:
-                    idxs.append((cur, cur + len(t)))
-                cur += len(t)
-            return idxs
-        done = False
+    def get_examples(self, response) -> List[WordUsageExample]:
+        """Returns list of WordUsageExample"""
         examples = []
-        for npage in range(1, self.page_count + 1):
-            if done:
+        for index, ex in enumerate(response['list']):
+
+            source = BeautifulSoup(ex["s_text"], features="lxml")
+            target = BeautifulSoup(ex["t_text"], features="lxml")
+            example = WordUsageExample(
+                source_text=source.text,
+                target_text=target.text
+            )
+            examples.append(example)
+            if index == self.examples_count-1:
                 break
-            self.__data["npage"] = npage
-            examples_json = self.session.post("https://context.reverso.net/bst-query-service", headers=HEADERS,
-                                              data=json.dumps(self.__data)).json()["list"]
-            for index, word in enumerate(examples_json):
-                source = BeautifulSoup(word["s_text"], features="lxml")
-                target = BeautifulSoup(word["t_text"], features="lxml")
-                examples.append((WordUsageExample(source.text, find_highlighted_idxs(source)),
-                                 WordUsageExample(target.text, find_highlighted_idxs(target))))
-                if index == self.examples_count - 1:
-                    done = True
-                    break
 
         return examples
+
+    async def do_post(self, session, url, word):
+        post_data = json.dumps({
+            "source_text": word,
+            "target_text": "",
+            "source_lang": self.source_lang,
+            "target_lang": self.target_lang,
+        })
+        async with session.post(url, data=post_data) as response:
+            response = await response.json()
+
+            translations = self.get_translations(response, word)
+            examples = self.get_examples(response)
+
+            return translations, examples
+
+    async def make_words(self):
+        for word in self.source_texts:
+            yield word
+
+    async def async_post_request(self):
+        url = "https://context.reverso.net/bst-query-service"
+        async with aiohttp.ClientSession(headers=HEADERS, connector=aiohttp.TCPConnector(verify_ssl=False)) as session:
+            post_tasks = []
+            async for w in self.make_words():
+                post_tasks.append(self.do_post(session, url, w))
+
+            res = await asyncio.gather(*post_tasks)
+
+            return res
+
+    def get_data(self):
+        response = asyncio.run(self.async_post_request())
+
+        return response
