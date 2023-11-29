@@ -1,73 +1,58 @@
-import requests
+from typing import List
 
+from mdpdf.converter import Converter
 from markdownmaker.document import Document
 from markdownmaker.markdownmaker import (
     Header,
     Bold,
     Paragraph,
-    UnorderedList,
     Italic,
     OrderedList
 )
-from mdpdf.converter import Converter
 
 
-def generate_pdf(pdf_filepath: str, md_filepath: str):
+def convert_data_to_md(data: List[tuple], filename: str) -> None:
+    """Function converts structured data to md file
+
+    arguments:
+    - data     : Provide with data received from api
+    - filename : name of md file that will be created
+    """
+
+    # Initializing Document class
+    doc = Document()
+
+    # Header of md file
+    doc.add(Header(Bold("Translations")))
+
+    # Parsing given data
+    for translation, examples in data:
+        # Adding translation of word
+        doc.add(
+            Paragraph(f'{Bold(translation.source_word)} - {", ".join(translation.translation)}'))
+
+        # Adding examples of word
+        doc.add(OrderedList(
+            tuple([
+                Italic(f"{example.source_text} - {example.target_text}")
+                for example in examples
+            ])
+        ))
+
+    md_content = doc.write()
+
+    with open(f"{filename}.md", "w") as fl:
+        fl.write(md_content)
+
+
+def convert_md_to_pdf(pdf_filepath: str, md_filepath: str) -> None:
+    """Function converts md file to pdf"""
     Converter(pdf_filepath).convert([md_filepath])
 
 
-def get_highlighted_text(text, highlighted):
-    highs = highlighted[0]
-    return text[highs[0]: highs[1]]
+def generate_pdf(data: List[tuple], filepath: str) -> None:
+    # Create md file
+    # Convert md to pdf
+    # delete md
 
-
-class MD_Generator:
-    """ Generates md file containing examples and translations
-    read for md to pdf conversion
-    Attributes:
-    - filename
-    - API object
-    """
-
-    def __init__(self, api, filename, words):
-        self.API = api
-        self.words = words
-        self.session = requests.Session()
-        self.filename = filename
-
-    def generate(self):
-        doc = Document()
-        doc.add(Header(Bold("Translations")))
-        for word in self.words:
-            # Get Data
-            api = self.API(
-                source_text=word,
-                source_lang="de",
-                target_lang="en",
-                req_session=self.session
-            )
-
-            # Translations
-            translations = [
-                word.translation for word in api.get_translations()]
-
-            # Examples
-            examples = []
-            for source_ex, target_ex in api.get_examples():
-                examples.append(
-                    f"{source_ex.text} - {target_ex.text}")
-
-            # wait
-            doc.add(
-                Paragraph(f'{Bold(api.source_text)} - {", ".join(translations)}'))
-
-            doc.add(OrderedList((
-                Italic(examples[0]),
-                Italic(examples[1]),
-                Italic(examples[2])
-            )))
-
-            md_text = doc.write()
-
-            with open(f"{self.filename}.md", "w") as fl:
-                fl.write(md_text)
+    pass

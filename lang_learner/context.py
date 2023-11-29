@@ -119,7 +119,7 @@ class ReversoContextAPI(object):
 
             return res
 
-    def get_data(self) -> List[tuple]:
+    def get_data(self) -> List[Tuple[Translation, List[WordUsageExample]]]:
         """Runs async post request and return response"""
         response = asyncio.run(self.async_post_request())
 
