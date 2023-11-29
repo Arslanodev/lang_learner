@@ -11,7 +11,13 @@ from markdownmaker.markdownmaker import (
 )
 
 
-def convert_data_to_md(data: List[tuple], filename: str) -> None:
+class Converter(Converter):
+    def convert_md(self, md_text: str):
+        ast = self.parser.parse(md_text)
+        self.renderer.render(ast, "")
+
+
+def convert_data_to_md(data: List[tuple]) -> str:
     """Function converts structured data to md file
 
     arguments:
@@ -41,18 +47,10 @@ def convert_data_to_md(data: List[tuple], filename: str) -> None:
 
     md_content = doc.write()
 
-    with open(f"{filename}.md", "w") as fl:
-        fl.write(md_content)
+    return md_content
 
 
-def convert_md_to_pdf(pdf_filepath: str, md_filepath: str) -> None:
-    """Function converts md file to pdf"""
-    Converter(pdf_filepath).convert([md_filepath])
-
-
-def generate_pdf(data: List[tuple], filepath: str) -> None:
-    # Create md file
-    # Convert md to pdf
-    # delete md
-
-    pass
+def create_pdf(dataset: List[tuple], outputFileName: str) -> None:
+    """Converts md text to pdf"""
+    md_content = convert_data_to_md(data=dataset)
+    Converter(outputFileName).convert_md(md_content)
