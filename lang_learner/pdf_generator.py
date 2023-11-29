@@ -17,7 +17,7 @@ class Converter(Converter):
         self.renderer.render(ast, "")
 
 
-def convert_data_to_md(data: List[tuple]) -> str:
+def __convert_data_to_md(data: List[tuple]) -> str:
     """Function converts structured data to md file
 
     arguments:
@@ -50,7 +50,7 @@ def convert_data_to_md(data: List[tuple]) -> str:
     return md_content
 
 
-def create_pdf(dataset: List[tuple], outputFileName: str) -> None:
+def convert_to_pdf(dataset: List[tuple], outputFileName: str) -> None:
     """Converts md text to pdf"""
-    md_content = convert_data_to_md(data=dataset)
+    md_content = __convert_data_to_md(data=dataset)
     Converter(outputFileName).convert_md(md_content)

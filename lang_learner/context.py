@@ -39,7 +39,6 @@ class ReversoContextAPI(object):
 
     def __init__(self,
                  source_texts: list = ["пример"],
-                 target_text: str = "",
                  source_lang: str = "de",
                  target_lang: str = "en",
                  examples_count: int = 3,
@@ -49,7 +48,6 @@ class ReversoContextAPI(object):
         self.trans_count = trans_count
 
         self.source_texts = source_texts
-        self.target_text = target_text
         self.source_lang = source_lang
         self.target_lang = target_lang
 
