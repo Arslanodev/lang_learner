@@ -12,9 +12,19 @@ List of future funtionalities:
 
 ### Usage Example:
 ```python
+"""Pdf generation"""
 from lang_learner import Context
 
 list_of_words = ["halo", "spiel", "verwenden"]
 
 Context(words=list_of_words, target_lang="de", source_lang="en").create_pdf("translations.pdf")
+```
+
+```python
+"""Voice translation mp3 generation"""
+from lang_learner import Voice
+
+Voice(
+    source_txt="vorweisen", target_txt="to present", filename="speech_01"
+).generate_speech()
 ```
