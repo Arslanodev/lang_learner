@@ -1,25 +1,38 @@
 from gtts import gTTS
 from pydub import AudioSegment
+import tempfile
 
 
 class Voice:
-    def __init__(self, source_txt: str, target_txt: str, filename: str):
+    def __init__(
+        self,
+        source_txt: str,
+        target_txt: str,
+        filename: str,
+        source_lang: str = "de",
+        target_lang: str = "en",
+    ):
         self.source_txt = source_txt
+        self.source_lang = source_lang
         self.target_txt = target_txt
+        self.target_lang = target_lang
         self.filename = filename
+        self.tfile_0 = tempfile.NamedTemporaryFile()
+        self.tfile_1 = tempfile.NamedTemporaryFile()
 
     def generate_mp3(self):
         audio_de = gTTS(text=self.source_txt, lang="de", slow=False)
         audio_en = gTTS(text=self.target_txt, lang="en", slow=False)
 
-        audio_de.save("user/speech_de.mp3")
-        audio_en.save("user/speech_en.mp3")
+        audio_de.save(self.tfile_0.name)
+        audio_en.save(self.tfile_1.name)
 
     def merge_audio(self):
-        sound_1 = AudioSegment.from_mp3("user/speech_de.mp3")
-        sound_2 = AudioSegment.from_mp3("user/speech_en.mp3")
+        sound_1 = AudioSegment.from_mp3(self.tfile_0.name)
+        sound_2 = AudioSegment.from_mp3(self.tfile_1.name)
+        delay = AudioSegment.silent(duration=1500)
 
-        speech = sound_1 + sound_2
+        speech = sound_1 + delay + sound_2
         speech.export(f"{self.filename}.mp3", format="mp3")
 
     def generate_speech(self):
