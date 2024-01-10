@@ -2,6 +2,7 @@
 env/
 
 # Ignore pdf and md files
+.DS_Store
 *.md
 *.pdf
 *.prof
