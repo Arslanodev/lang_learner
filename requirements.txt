@@ -1,7 +1,0 @@
-beautifulsoup4==4.12.2
-mdpdf==0.0.18
-click==8.1.7
-markdownmaker==0.4.0
-aiohttp==3.9.1
-lxml==4.9.3
-mdpdf==0.0.18

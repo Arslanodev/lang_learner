@@ -1,5 +1,6 @@
 # Ignore env folder
 env/
+mock/
 
 # Ignore pdf and md files
 .DS_Store

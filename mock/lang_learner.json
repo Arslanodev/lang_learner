@@ -59,7 +59,7 @@
     {
       "uuid": "faeb0750-67a1-4f4a-b60a-d01f67033150",
       "type": "http",
-      "documentation": "",
+      "documentation": "Returns Pdf file containing quizes and answer_keys",
       "method": "post",
       "endpoint": "api/v1/learner/quiz",
       "responses": [
@@ -88,7 +88,7 @@
     {
       "uuid": "8498304a-d3ee-48b5-b2e1-14fa51a4a364",
       "type": "http",
-      "documentation": "",
+      "documentation": "Returns zip file containing mp3 files",
       "method": "post",
       "endpoint": "api/v1/learner/voice",
       "responses": [
@@ -117,7 +117,7 @@
     {
       "uuid": "096fb0b9-ebe7-4c3d-9796-21e5f4bb15fe",
       "type": "http",
-      "documentation": "",
+      "documentation": "Returns pdf file containing translations and examples",
       "method": "post",
       "endpoint": "api/v1/learner/pdf",
       "responses": [
