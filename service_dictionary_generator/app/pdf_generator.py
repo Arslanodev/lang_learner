@@ -4,7 +4,7 @@ from mdpdf.converter import Converter
 from markdownmaker.document import Document
 from markdownmaker.markdownmaker import Header, Bold, Paragraph, Italic, OrderedList
 
-from ..reverso_api.context import Translation, WordUsageExample
+from reverso_api.reverso_api import Translation, WordUsageExample
 
 
 class Context:

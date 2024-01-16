@@ -1,0 +1,3 @@
+flask = "^3.0.0"
+mdpdf = "^0.0.18"
+markdownmaker = "^0.4.0"

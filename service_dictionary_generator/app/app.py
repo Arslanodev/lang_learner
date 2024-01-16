@@ -1,5 +1,7 @@
 from flask import Flask, request, send_file
-from pdf_generator import convert_to_pdf
+from .pdf_generator import convert_to_pdf
+from reverso_api.reverso_api import ReversoContextAPI
+
 
 app = Flask(__name__)
 
