@@ -1,41 +1,18 @@
 """Reverso Context (context.reverso.net) API for Python"""
-import json
 import asyncio
-
+import json
 from typing import Iterator
-from collections import namedtuple
 
 import aiohttp
-
 from bs4 import BeautifulSoup
+
+from .const import HEADERS, Translation, WordUsageExample
 
 __all__ = ["ReversoContextAPI"]
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0",
-    "Content-Type": "application/json; charset=UTF-8",
-}
-
-WordUsageExample = namedtuple("WordUsageExample", ("source_text", "target_text"))
-
-Translation = namedtuple("Translation", ("source_word", "translation"))
-
 
 class ReversoContextAPI(object):
-    """Class for Reverso Context API (https://voice.reverso.net/)
-
-    Attributes:
-        source_text
-        target_text
-        source_lang
-        target_lang
-        page_count
-
-    Methods:
-        get_translations()
-        get_examples()
-
-    """
+    """Class for Reverso Context API (https://voice.reverso.net/)"""
 
     def __init__(
         self,
@@ -52,7 +29,7 @@ class ReversoContextAPI(object):
         self.source_lang = source_lang
         self.target_lang = target_lang
 
-    def get_translations(self, response: dict, word: str) -> Translation:
+    def __get_translations(self, response: dict, word: str) -> Translation:
         "Returns Translation namedtuple"
         trans_ls = []
         for index, item in enumerate(response["dictionary_entry_list"]):
@@ -63,7 +40,7 @@ class ReversoContextAPI(object):
 
         return Translation(source_word=word, translation=trans_ls)
 
-    def get_examples(self, response: dict) -> list[WordUsageExample]:
+    def __get_examples(self, response: dict) -> list[WordUsageExample]:
         """Returns list of WordUsageExample"""
         examples = []
         for index, ex in enumerate(response["list"]):
@@ -90,8 +67,8 @@ class ReversoContextAPI(object):
         async with session.post(url=url, data=post_data) as response:
             response = await response.json()
 
-            translations = self.get_translations(response, word)
-            examples = self.get_examples(response)
+            translations = self.__get_translations(response, word)
+            examples = self.__get_examples(response)
 
             return translations, examples
 
