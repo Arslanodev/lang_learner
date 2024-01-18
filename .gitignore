@@ -1,17 +1,14 @@
-# Ignore env folder
-env/
-mock/
+# Ignore _pycache__ folders
+**/__pycache__/
 
-# Ignore pdf and md files
-.DS_Store
-*.pdf
-*.prof
+# Ignore .vscode folders
+**/.vscode/
 
-# Ignore testing file
-test.py
+# Ignore .DS_Store filrs
+**/.DS_Store
 
-# Ignore cache files
-lang_learner/__pycache__/
+#ignore db files
+#**/*.db
 
-# Ignore generated file
-translations.md
+#ignore .pytest_cache files
+**/.pytest_cache
