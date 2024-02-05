@@ -1,2 +1,5 @@
-gtts = "^2.5.0"
-pydub = "^0.25.1"
+gtts
+pydub
+reverso_api @ git+https://github.com/Arslanodev/reverso_api
+flask
+lxml
