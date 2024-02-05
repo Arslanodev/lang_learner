@@ -1,3 +1,5 @@
-flask = "^3.0.0"
-mdpdf = "^0.0.18"
-markdownmaker = "^0.4.0"
+flask == 3.0.0
+mdpdf == 0.0.18
+markdownmaker == 0.4.0
+reverso_api @ git+https://github.com/Arslanodev/reverso_api
+lxml
