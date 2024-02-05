@@ -1,6 +1,7 @@
+import tempfile
+
 from gtts import gTTS
 from pydub import AudioSegment
-import tempfile
 
 
 class Voice:
@@ -24,6 +25,7 @@ class Voice:
         audio_de = gTTS(text=self.source_txt, lang="de", slow=False)
         audio_en = gTTS(text=self.target_txt, lang="en", slow=False)
 
+        # Slow down
         audio_de.save(self.tfile_0.name)
         audio_en.save(self.tfile_1.name)
 
