@@ -22,8 +22,8 @@ class Voice:
         self.tfile_1 = tempfile.NamedTemporaryFile()
 
     def generate_mp3(self):
-        audio_de = gTTS(text=self.source_txt, lang="de", slow=False)
-        audio_en = gTTS(text=self.target_txt, lang="en", slow=False)
+        audio_de = gTTS(text=self.source_txt, lang=self.source_lang, slow=False)
+        audio_en = gTTS(text=self.target_txt, lang=self.target_lang, slow=False)
 
         # Slow down
         audio_de.save(self.tfile_0.name)
