@@ -1,5 +1,6 @@
 from markdownmaker.document import Document
-from markdownmaker.markdownmaker import Bold, Header, Italic, OrderedList, Paragraph
+from markdownmaker.markdownmaker import (Bold, Header, Italic, OrderedList,
+                                         Paragraph)
 from mdpdf.converter import Converter
 from reverso_api import ReversoContextAPI
 

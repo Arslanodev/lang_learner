@@ -12,3 +12,4 @@
 
 #ignore .pytest_cache files
 **/.pytest_cache
+.idea

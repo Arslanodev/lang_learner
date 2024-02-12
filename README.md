@@ -1,10 +1,32 @@
-# Services for learning languages
-This project contains various microservices purposes of which focused on language learning.  
+# Service Dict Generator
+Service for generating pdf file containing translations and examples of given words
 
-Current list of microservices:
-1. Service that generates dictionary of words with examples in a pdf format
-2. Service that generates mp3 files containing translations in a spoken format
-3. Service that generates quiz test to check if you learned provided vocabulary
+### API endpoints
+`POST` - `/api/v1/pdf`. Request data:
+```json
+{
+    "source_texts": ["word_1", "word_2", "word_3"],
+    "source_lang": "en",
+    "target_lang": "de"
+}
+```
 
-List of future services:
-- Service that generates list of words relevant for particular field.
+
+# Service Spoken Words
+Service for generating mp3 files containing spoken words with translations
+
+### API endpoints
+
+`POST` - `api/v1/speak`. Request data should contain:
+```json
+"data": {
+    "words": {
+        "word_1": "word_1",
+        "word_2": "word_2"
+    }
+    "source_lang": "en",
+    "target_lang": "de"
+}
+```
+
+`RESPONSE` --> download link for zip file containing mp3 files
