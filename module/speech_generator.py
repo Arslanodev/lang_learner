@@ -8,8 +8,7 @@ from reverso_api import ReversoContextAPI
 
 
 def generate_mp3(source_texts: list, source_lang: str, target_lang: str):
-    temp_dir = tempfile.TemporaryDirectory(dir="./temp_dirs")
-    dir_name = temp_dir.name.split("/")[-1]
+    temp_dir = tempfile.TemporaryDirectory(dir=".")
     zip_dir_name = "voices"
 
     os.makedirs(os.path.join(temp_dir.name, zip_dir_name))
@@ -32,7 +31,7 @@ def generate_mp3(source_texts: list, source_lang: str, target_lang: str):
     shutil.make_archive(
         base_name=f"file_storage/{unique_filename}",
         format="zip",
-        root_dir=f"temp_dirs/{dir_name}",
+        root_dir=temp_dir.name,
         base_dir="voices",
     )
     temp_dir.cleanup()

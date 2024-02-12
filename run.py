@@ -23,7 +23,7 @@ def generate_pdf():
     convert_to_pdf(dataset=obj, outputFileName=filepath)
 
     return {
-        "download_link": f"/api/v1/download/{filename}"
+        "download_link": f"/api/v1/download/{filename}.pdf"
     }
 
 
@@ -34,7 +34,7 @@ def mp3_generator():
                             target_lang=data["target_lang"])
 
     return {
-        "download_link": f"/api/v1/download/{filename}"
+        "download_link": f"/api/v1/download/{filename}.zip"
     }
 
 
@@ -53,4 +53,4 @@ def download_file(filename):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="8000", debug=True)
+    app.run(host="0.0.0.0", port="8080 ", debug=True)
