@@ -19,11 +19,8 @@ Service for generating mp3 files containing spoken words with translations
 
 `POST` - `api/v1/speak`. Request data should contain:
 ```json
-"data": {
-    "words": {
-        "word_1": "word_1",
-        "word_2": "word_2"
-    }
+{
+    "source_texts": ["word_1", "word_2", "word_3"],
     "source_lang": "en",
     "target_lang": "de"
 }

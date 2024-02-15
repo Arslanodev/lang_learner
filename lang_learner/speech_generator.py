@@ -3,7 +3,7 @@ import uuid
 import shutil
 import tempfile
 
-from module.text_to_speech import Voice
+from lang_learner.text_to_speech import Voice
 from reverso_api import ReversoContextAPI
 
 
