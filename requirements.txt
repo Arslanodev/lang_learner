@@ -1,9 +1,8 @@
-fastapi
-mdpdf == 0.0.18
-markdownmaker == 0.4.0
+fastapi==0.109.2
+mdpdf==0.0.18
+markdownmaker==0.4.0
 reverso_api @ git+https://github.com/Arslanodev/reverso_api
-lxml
-pydub
-gtts
-uvicorn
-pydantic
+lxml==5.1.0
+pydub==0.25.1
+gTTS==2.5.1
+uvicorn==0.27.1

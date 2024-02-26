@@ -1,6 +1,5 @@
 from markdownmaker.document import Document
-from markdownmaker.markdownmaker import (Bold, Header, Italic, OrderedList,
-                                         Paragraph)
+from markdownmaker.markdownmaker import Bold, Header, Italic, OrderedList, Paragraph
 from mdpdf.converter import Converter
 from reverso_api import ReversoContextAPI
 
@@ -69,7 +68,9 @@ def __convert_data_to_md(data: list[tuple]) -> str:
     return md_content
 
 
-def convert_to_pdf(dataset: list[tuple], outputFileName: str) -> None:
+def convert_to_pdf(dataset: list[tuple], outputFileName: str) -> str:
     """Converts md text to pdf"""
     md_content = __convert_data_to_md(data=dataset)
     Converter(outputFileName).convert_md(md_content)
+
+    return ""

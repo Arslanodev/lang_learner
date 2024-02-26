@@ -1,12 +1,12 @@
-FROM python:3.11.2-alpine3.17
+FROM python:3.12.2-alpine3.17
 
-WORKDIR /service_2
+WORKDIR /app
 
-COPY requirements.txt requirements.txt
+COPY requirements.txt app/requirements.txt
 RUN pip3 install -r requirements.txt
 
-COPY . .
+COPY . ./app
 
-CMD [ "python3", "run.py"]
+CMD [ "python3", "app.py"]
 
 EXPOSE 8002
