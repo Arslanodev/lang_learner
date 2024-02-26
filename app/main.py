@@ -54,4 +54,4 @@ def download_file(filename):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app)
+    uvicorn.run(app, port="4000")
