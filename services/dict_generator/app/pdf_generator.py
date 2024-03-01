@@ -71,6 +71,7 @@ def __convert_data_to_md(data: list[tuple]) -> str:
 def convert_to_pdf(dataset: list[tuple], outputFileName: str) -> str:
     """Converts md text to pdf"""
     md_content = __convert_data_to_md(data=dataset)
+
     Converter(outputFileName).convert_md(md_content)
 
     return ""

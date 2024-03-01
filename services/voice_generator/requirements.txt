@@ -1,0 +1,6 @@
+pydub==0.25.1
+gTTS==2.5.1
+uvicorn==0.27.1
+reverso_api @ git+https://github.com/Arslanodev/reverso_api
+fastapi==0.109.2
+lxml==5.1.0

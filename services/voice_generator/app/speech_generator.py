@@ -3,10 +3,9 @@ import shutil
 import tempfile
 import uuid
 
-from reverso_api import ReversoContextAPI
-
 from gtts import gTTS
 from pydub import AudioSegment
+from reverso_api import ReversoContextAPI
 
 
 class Voice:

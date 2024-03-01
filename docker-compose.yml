@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  voice:  
+    build: ./services/voice_generator
+    container_name: "voice_app_c1"
+    ports:
+      - 8080:8080
+  
+  dict:
+    build: ./services/dict_generator
+    container_name: "dict_app_c1"
+    ports:
+      - 8000:8000
