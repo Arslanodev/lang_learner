@@ -47,6 +47,7 @@ As a response:
     - API key authendication  
     - Telegram bot integration  
     - Asynchronous code implementation  
+    - Tests
 
 
 # How to run this application
